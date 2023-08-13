@@ -1,0 +1,263 @@
+<html>
+    <head>
+        <script src="js/gl-Matrix.js"></script>
+        <script src="js/voxels.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/caterrain.js"></script>
+        <script src="js/ui.js"></script>
+        <style type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.019/css/hack.min.css"></style>
+        <style>
+            :root {
+                --text-percent: .4;
+                --field-percent: .58;
+
+                --row-width: 275px;
+
+                --label-width: calc(var(--row-width) * var(--text-percent));
+                --field-width: calc(var(--field-percent) * var(--row-width));
+
+                --row-height: 18px;
+            }
+            body {
+                padding: 0px;
+                margin: 0px;
+
+                font-family: "Hack", monospace;
+                font-size: 12px;
+                color: rgb(251, 251, 251);
+            }
+            .ui {
+                width: var(--row-width);
+                margin: 3px;
+                padding: 6px;
+                background-color: rgb(35, 35, 35);
+            }
+            .ui-row {
+                width: var(--row-width);
+                padding: 0px;
+                margin: 0px;
+                
+                display: flex;
+            }
+            .ui-row + .ui-row {
+                margin-top: 3px;
+            }
+            .header-row {
+                width: var(--row-width);
+                height: var(--row-height);
+                text-align: center;
+                line-height: 18px;
+                color: rgb(161, 161, 161);
+            }
+            .row-label {
+                height: var(--row-height);
+                width: var(--label-width);
+                line-height: 18px;
+                text-align: right;
+            }
+            .row-spacer {
+                width: calc((1 - (var(--text-percent) + var(--field-percent))) * var(--row-width));
+                height: var(--row-height);
+            }
+            .row-field {
+                width: var(--field-width);
+                height: var(--row-height);
+            }
+            .row-field {
+                color: rgb(161, 161, 161);
+                display: flex;
+            }
+            .row-field > button {
+                width: 100%;
+                height: 100%;
+
+                border: none;
+                color: rgb(161, 161, 161);
+                font-family: "Hack", monospace;
+                font-size: 12px;
+                background-color: rgb(54, 54, 54);
+            }
+            .row-field > input[type="color"] {
+                -webkit-appearance: none;
+                appearance: none;
+                border: none;
+                background: none;
+                padding: 0px; margin: 0px;
+                width: var(--row-height); 
+                height: var(--row-height);
+            }
+            .row-field > input[type="color"]::-webkit-color-swatch-wrapper {
+                padding: 0px; margin: 0px;
+            }
+            input[type="range"] {
+                -webkit-appearance: none;
+                appearance: none;
+
+                background-color: rgb(54, 54, 54);
+
+                width: 90px;
+                
+                height: var(--row-height);
+                padding: 0px;
+            }
+            input[type="text"] {
+                width: 100%;
+                border: none;
+                background-color: rgb(54, 54, 54);
+                color: rgb(161, 161, 161);
+                font-family: 'Hack', monospace;
+                text-align: center;
+            }
+            input[type="range"] {
+                margin: 0px 5px 0px 0px;
+                width: 113px;
+            }
+            input[type="color"] ~ input[type="range"] {
+                width: 90px;
+                margin: 0px 5px;
+            }
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: calc(var(--row-height) * .25);
+                height: var(--row-height);
+                background-color: rgb(80, 80, 80);
+            }
+            .slider-value {
+                height: var(--row-height);
+                flex-grow: 1;
+                text-align: center;
+                line-height: 18px;
+                background-color: rgb(54, 54, 54);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="ui" style="z-index: 1; position: absolute;">
+            <div class="ui-row">
+                <div class="header-row">CAMERA</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">focal distance</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="focal-distance-slider" min="0.001" max="1" step=".0001" value=".5">
+                    <div class="slider-value" id="focal-distance-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">aperture</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="aperture-slider" min="0" max="1" step=".001" value=".01">
+                    <div class="slider-value" id="aperture-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="header-row">LIGHTING</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">sun</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="color" id="sun-color" value="#fff4db">
+                    <input type="range" id="sun-brightness-slider" min="0" max="10" step=".01" value="5.43">
+                    <div class="slider-value" id="sun-brightness-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">sun azimuth</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="azimuth-slider" min="0" max="360" step=".1" value="349">
+                    <div class="slider-value" id="azimuth-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">sun zenith</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="zenith-slider" min="-179.9" max="-.1" step=".1" value="-32">
+                    <div class="slider-value" id="zenith-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">sky</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="color" id="sky-color" value="#dcfafe">
+                    <input type="range" id="sky-brightness-slider" min="0" max="10" step=".01" value=".5">
+                    <div class="slider-value" id="sky-brightness-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="header-row">SCENE</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label"></div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="new-rule">new rule</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">rule seed</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="text" value="673-966-187-297" id="rule-seed">
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label"></div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="regenerate-scene">regenerate scene</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">stage</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="generation-stage">complete</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="header-row">RENDER</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label"></div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="save-image">save image</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label"></div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="reset-render">reset render</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">samples</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="samples-count">0</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="header-row">CONTROLS</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">speed</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="speed-slider" min="0.1" max="10" step=".1" value="4">
+                    <div class="slider-value" id="speed-value">1.50</div>
+                </div>
+            </div>
+        </div>
+        <div style="z-index: -1;">
+            <canvas id="render-target" style="width: 100%; height: 100%; margin: 0px; z-index : -1;"></canvas>
+        </div>
+    </body>
+</html>
