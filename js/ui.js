@@ -2,7 +2,7 @@ function focalMap(a) {
     return Math.exp((a - .2) * 7.);
 }
 
-function initUI(flags, callbacks) {
+function initUI(flags, callbacks, size) {
     uiBindSlider(
         document.querySelector("#focal-distance-slider"),
         focalMap,
@@ -149,6 +149,12 @@ function initUI(flags, callbacks) {
         helpBackground.style.display = "none";
     };
     helpBackground.onclick();
+
+    document.querySelector("#copy-seed").onclick = () => {
+        const root = window.location.href.split("?")[0];
+
+        navigator.clipboard.writeText(root + `?size=${size}&seed=${document.querySelector("#rule-seed").value}`);
+    };
 }
 
 //writes all UI values to a typed array to be sent to the GPU

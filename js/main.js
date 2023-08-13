@@ -19,7 +19,7 @@ window.onload = async () => {
     //UI to add:
     //postprocessing - aces, reinhard, gamma, exposure
     const flags = {"changed": true, "lock-input": false};
-    initUI(flags, {"setScene": setScene});
+    initUI(flags, {"setScene": setScene}, size);
 
     let vox = await voxels(document.querySelector("canvas"), size, 
     {profiling: false, "subvoxel-dimension": 3}
