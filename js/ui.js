@@ -127,12 +127,10 @@ function initUI(flags, callbacks, size) {
     aces.oninput = () => {
         console.log(tonemap.dataset.mode);
         if (tonemap.dataset.mode == 0) {return;}
-        flags["changed"] = true;
         setACES();
     };
     reinhard.oninput = () => {
         if (tonemap.dataset.mode == 1) {return;}
-        flags["changed"] = true;
         setReinhard();
     };
 
