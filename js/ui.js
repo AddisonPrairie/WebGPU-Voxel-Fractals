@@ -109,9 +109,7 @@ function initUI(flags, callbacks, size) {
 
     const tonemap = document.querySelector("#tone-mapping");
     const aces = document.querySelector("#aces");
-    const acesButton = document.querySelector("#aces-button");
     const reinhard = document.querySelector("#reinhard");
-    const reinhardButton = document.querySelector("#reinhard-button");
 
     const setACES = () => {
         aces.checked = true;
@@ -128,10 +126,12 @@ function initUI(flags, callbacks, size) {
         console.log(tonemap.dataset.mode);
         if (tonemap.dataset.mode == 0) {return;}
         setACES();
+        flags["changed"] = true;
     };
     reinhard.oninput = () => {
         if (tonemap.dataset.mode == 1) {return;}
         setReinhard();
+        flags["changed"] = true;
     };
 
     setReinhard();
