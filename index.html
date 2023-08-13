@@ -129,9 +129,110 @@
                 line-height: 18px;
                 background-color: rgb(54, 54, 54);
             }
+            input[type="checkbox"] {
+                -webkit-appearance: none;
+                appearance: none;
+                margin: 0px 3px 0px 0px;
+                border: 1px;
+                width: calc(var(--row-height) - 8px);
+                height: calc(var(--row-height));
+                background-color: rgb(54, 54, 54);
+
+                display: grid;
+                place-content: center;
+            }
+            button + input[type="checkbox"] {
+                margin-left: 3px;
+            }
+            input[type="checkbox"]::before {
+                content: "";
+                width: 0.65em;
+                height: 0.65em;
+                width: calc(var(--row-height) - 8px);
+                height: calc(var(--row-height));
+                transform: scale(0);
+                background-color: rgb(80, 80, 80);
+            }
+            input[type="checkbox"]:checked::before {
+                transform: scale(1);
+            }
+            .row-field > .check-label {
+                text-align: center;
+                width: 1px; flex-grow: 1;
+                flex-shrink: 1;
+                margin: 0px;
+            }
+            .help-background {
+                width: 100%; height: 100%;
+                position: absolute; z-index: 2;
+                backdrop-filter: blur(2px);
+                background-color: rgba(0, 0, 0, .4);
+                border: none; margin: 0px;
+            }
+            .help {
+                z-index: 3; position: absolute;
+
+                left: 50%; top: 50%;
+                transform: translate(-50%, -50%);
+
+                width: 500px;
+                font-family: "Hack", monospace;
+                font-size: 12px;
+                color: rgb(226, 226, 226);
+                background-color: rgb(35, 35, 35);
+            }
+            .help > p {
+                margin: 10px;
+            }
+            .help-text > a {
+                color: rgb(251, 251, 251);
+            }
         </style>
     </head>
     <body>
+        <button class="help-background">
+        </button>
+        <div class="help">
+            <p class="help-text">
+                This is an interactive voxel renderer written in WebGPU.<br>
+                <br>
+                Controls:<br>
+                &nbsp&nbspW/S - move forward/backward<br>
+                &nbsp&nbspA/D - move left/right<br>
+                &nbsp&nbspshift/space - move down/up<br>
+                <br>
+                Settings:<br>
+                &nbsp&nbspfocal distance - distance to focal plane<br>
+                &nbsp&nbspaperture - amount of blur when out of focus<br>
+                &nbsp&nbsptonemapping - maps HDR colors to displays<br>
+                &nbsp&nbspsun - sun color and intensity<br>
+                &nbsp&nbspsun azimuth - sun's upright rotation<br>
+                &nbsp&nbspsun zenith - sun's vertical rotation<br>
+                &nbsp&nbspsky - sky color and intensity<br>
+                &nbsp&nbspnew rule - generates a new rule seed<br>
+                &nbsp&nbsprule seed - seed used to generate fractal<br>
+                &nbsp&nbspregenerate scene - create new scene with seed<br>
+                &nbsp&nbspstage - status of scene generation<br>
+                &nbsp&nbspspeed - camera movement speed<br>
+                <br>
+                The default scene size is 64x64x64. Other available sizes include:<br>
+                32x32x32, 64x64x64, 128x128x128, 256x256x256, 512x512x512<br>
+                To use a different size, insert or edit the size query in the URL <br>(i.e., ?size=xxx) and reload the page. For example, going to<br><br>
+                <a href="https://addisonprairie.github.io/WebGPU-Voxel-Fractals/?size=128">https://addisonprairie.github.io/WebGPU-Voxel-Fractals/?size=128</a><br><br>
+                will let you explore 128x128x128 fractals. Note that larger fractals will take longer to generate. For 512^3 fractals, your browser may notify you that the page has stopped responding. It just needs a moment.<br><br>
+                Additionally, if you find a seed you like and want to share it with others, you can insert that seed into the URL like: <br><br>
+                https:// ... /?size=128&seed=673-966-187-297<br><br>
+                When another person clicks on your link, they will automatically load in with that seed.<br>
+                <br>
+                &Tab;The fractal generation code is a port of Brent Werness' "Voxel Automata Terrain." The source used for 
+                the port is available <a href="https://bitbucket.org/BWerness/voxel-automata-terrain/src/master/">here</a>. The rendering code was written by me (Addison Prairie). It uses <a href="https://github.com/toji/gl-matrix">glMatrix</a> for
+                certain host-side linear algebra operations. Other attributions for specific functions can be found in the source code, which is available <a href="https://github.com/AddisonPrairie/WebGPU-Voxel-Fractals">here</a>.<br>
+                <br>
+                Feel free to share any images generated with this site. The underlying voxel rendering engine is a single-file, free to use, and open-source.<br>
+                <br>
+                Follow me on twitter: <a href="https://twitter.com/AddisonPrairie">@AddisonPrairie</a>
+            </p>
+        </div>
         <div class="ui" style="z-index: 1; position: absolute;">
             <div class="ui-row">
                 <div class="header-row">CAMERA</div>
@@ -150,6 +251,14 @@
                 <div class="row-field">
                     <input type="range" id="aperture-slider" min="0" max="1" step=".001" value=".01">
                     <div class="slider-value" id="aperture-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label" data-mode="0" id="tone-mapping">tone mapping</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="checkbox" id="aces"><button class="check-label" id="aces-button">aces</button>
+                    <input type="checkbox" id="reinhard"><button class="check-label" id="reinhard-button">reinhard</button>
                 </div>
             </div>
             <div class="ui-row">
@@ -245,6 +354,13 @@
                 </div>
             </div>
             <div class="ui-row">
+                <div class="row-label">GPU device</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="adapter-info">n/a</button>
+                </div>
+            </div>
+            <div class="ui-row">
                 <div class="header-row">CONTROLS</div>
             </div>
             <div class="ui-row">
@@ -253,6 +369,13 @@
                 <div class="row-field">
                     <input type="range" id="speed-slider" min="0.1" max="10" step=".1" value="4">
                     <div class="slider-value" id="speed-value">1.50</div>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label"></div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <button id="help">help</button>
                 </div>
             </div>
         </div>

@@ -26,6 +26,26 @@ window.onload = async () => {
     );
 
     vox.setFOV(Math.PI / 4.);
+
+    if (vox.adapterInfo) {
+        const str = vox.adapterInfo["description"];
+        let outstr = ""; const max_size = 21;
+        if (str) {
+            for (var i = 0; i < max_size - 3; i++) {
+                if (str[i]) outstr += str[i];
+            }
+            if (str.length > max_size) {
+                outstr += "...";
+            } else {
+                if (str[max_size - 2]) outstr += str[max_size - 2];
+                if (str[max_size - 1]) outstr += str[max_size - 1];
+                if (str[max_size - 0]) outstr += str[max_size - 0];
+            }
+        } else {
+            outstr = "no info found";
+        }
+        document.querySelector("#adapter-info").innerHTML = outstr;
+    }
     
     //set voxel materials
     const vx = [

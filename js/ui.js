@@ -106,6 +106,49 @@ function initUI(flags, callbacks) {
         document.querySelector("#generation-stage").innerHTML = `complete`;
         flags["lock-input"] = false;
     };
+
+    const tonemap = document.querySelector("#tone-mapping");
+    const aces = document.querySelector("#aces");
+    const acesButton = document.querySelector("#aces-button");
+    const reinhard = document.querySelector("#reinhard");
+    const reinhardButton = document.querySelector("#reinhard-button");
+
+    const setACES = () => {
+        aces.checked = true;
+        reinhard.checked = false;
+        tonemap.dataset.mode = 0;
+    };
+    const setReinhard = () => {
+        aces.checked = false;
+        reinhard.checked = true;
+        tonemap.dataset.mode = 1;
+    }
+
+    aces.oninput = () => {
+        console.log(tonemap.dataset.mode);
+        if (tonemap.dataset.mode == 0) {return;}
+        flags["changed"] = true;
+        setACES();
+    };
+    reinhard.oninput = () => {
+        if (tonemap.dataset.mode == 1) {return;}
+        flags["changed"] = true;
+        setReinhard();
+    };
+
+    setReinhard();
+
+    const helpWindow = document.querySelector(".help");
+    const helpBackground = document.querySelector(".help-background");
+    document.querySelector("#help").onclick = () => {
+        helpWindow.style.display = "";
+        helpBackground.style.display = "";
+    };
+    helpBackground.onclick = () => {
+        helpWindow.style.display = "none";
+        helpBackground.style.display = "none";
+    };
+    helpBackground.onclick();
 }
 
 //writes all UI values to a typed array to be sent to the GPU
@@ -123,6 +166,7 @@ function getUIValues() {
     returned[11]= parseFloat(document.querySelector("#sky-brightness-slider").value);
     returned[12]=parseFloat(document.querySelector("#azimuth-slider").value * Math.PI / 180.);
     returned[13]=parseFloat(Math.PI / 2. + document.querySelector("#zenith-slider").value * Math.PI / 180.);
+    returned[14]=document.querySelector("#tone-mapping").dataset.mode;
     return returned;
 }
 

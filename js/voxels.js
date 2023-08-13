@@ -71,7 +71,8 @@ async function voxels(canvas, size, options) {
         sun           : vec4f,
         sky           : vec4f,
         azimuth       :   f32,
-        zenith        :   f32
+        zenith        :   f32,
+        tonemapping   :   f32
     }
 
     struct VoxelMaterial {
@@ -334,6 +335,7 @@ async function voxels(canvas, size, options) {
     @group(0) @binding(0) var<uniform> uniforms : UBO;
     @group(0) @binding(1) var gbuffer : texture_2d<f32>;
     @group(0) @binding(2) var finalImage : texture_2d<f32>;
+    @group(0) @binding(3) var<uniform> settings : RenderSettings;
 
     fn aces(x : vec3f) -> vec3f {
         return clamp(
@@ -343,14 +345,19 @@ async function voxels(canvas, size, options) {
         );
     }
 
-    fn toneMap(z : vec3f) -> vec3f {
+    fn reinhard(z : vec3f) -> vec3f {
         return z / vec3f(1. + dot(z, vec3f(.2126, .7152, .0722)));
     }
 
     @fragment
     fn fs(@builtin(position) fragCoord : vec4f) -> @location(0) vec4f {
         var col : vec3f = textureLoad(finalImage, vec2i(fragCoord.xy), 0).xyz;
-        col = aces(col);
+        if (settings.tonemapping == 0.) {
+            col = aces(col);
+        }
+        if (settings.tonemapping == 1.) {
+            col = reinhard(col);
+        }
         col = pow(col, vec3f(1. / 2.2));
         return vec4f(col, 1.);
     }`;
@@ -755,7 +762,8 @@ async function voxels(canvas, size, options) {
         entries: [
             {binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {type: "uniform"}},
             {binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {sampleType: "unfilterable-float", viewDimension: "2d", multisampled: false}},
-            {binding: 2, visibility: GPUShaderStage.FRAGMENT, texture: {sampleType: "float", viewDimension: "2d", multisampled: false}}
+            {binding: 2, visibility: GPUShaderStage.FRAGMENT, texture: {sampleType: "float", viewDimension: "2d", multisampled: false}},
+            {binding: 3, visibility: GPUShaderStage.FRAGMENT, buffer: {type: "uniform"}}
         ]
     });
     let fsBGs = [null, null];
@@ -881,7 +889,8 @@ async function voxels(canvas, size, options) {
             entries: [
                 {binding: 0, resource: {buffer: uniformBuffer}},
                 {binding: 1, resource: gBufferResultTexture.createView()},
-                {binding: 2, resource: pathtraceResultTextures[0].createView()}
+                {binding: 2, resource: pathtraceResultTextures[0].createView()},
+                {binding: 3, resource: {buffer: renderSettingsBuffer}}
             ]
         });
         fsBGs[1] = device.createBindGroup({
@@ -890,7 +899,8 @@ async function voxels(canvas, size, options) {
             entries: [
                 {binding: 0, resource: {buffer: uniformBuffer}},
                 {binding: 1, resource: gBufferResultTexture.createView()},
-                {binding: 2, resource: pathtraceResultTextures[1].createView()}
+                {binding: 2, resource: pathtraceResultTextures[1].createView()},
+                {binding: 3, resource: {buffer: renderSettingsBuffer}}
             ]
         });
     }
@@ -1121,5 +1131,5 @@ async function voxels(canvas, size, options) {
         fReset = true;
     }
 
-    return {frame, setPosition, setLookAt, setFOV, uploadScene, setVoxel, setMaterial, uploadMaterials, setReset, uploadRenderSettings, downloadImage};
+    return {frame, setPosition, setLookAt, setFOV, uploadScene, setVoxel, setMaterial, uploadMaterials, setReset, uploadRenderSettings, downloadImage, adapterInfo: await adapter.requestAdapterInfo()};
 }
