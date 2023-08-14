@@ -2,7 +2,7 @@ let state = null;let L = 0;let K = 0;
 let cubeRule = [[], [], [], [], [], [], [], [], []];
 let faceRule = [[], [], [], [], [], [], []];
 let edgeRule = [[], [], [], [], [], [], []];
-let flipP = 1.;
+let flipP = .9;
 let symmetricAdd = 1.;
 let caterrainsize = 0;
 window.onload = async () => {
@@ -12,7 +12,7 @@ window.onload = async () => {
         paramList[pair[0]] = pair[1];
     }
 
-    const size = "size" in paramList ? paramList["size"] : 64;
+    const size = "size" in paramList ? paramList["size"] : 128;
 
     if ("seed" in paramList) {document.querySelector("#rule-seed").value = paramList["seed"];}
 
@@ -48,7 +48,24 @@ window.onload = async () => {
     }
     
     //set voxel materials
-    const vx = [
+    const full = [
+        [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ],
+        [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ],
+        [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ],
+    ];
+    const menger = [
         [
             [1, 1, 1],
             [1, 0, 1],
@@ -65,11 +82,44 @@ window.onload = async () => {
             [1, 1, 1],
         ],
     ];
+    const cross = [
+        [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 0, 0],
+        ],
+        [
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 1, 0],
+        ],
+        [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 0, 0],
+        ],
+    ];
+    const tubeUp = [
+        [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ],
+        [
+            [1, 1, 1],
+            [0, 0, 0],
+            [1, 1, 1],
+        ],
+        [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1],
+        ],
+    ];
+    
+    const voxelMaterials = [full, menger, cross, tubeUp];
 
-    var col = [211. / 256., 210. / 256., 206. / 256.];
-    vox.setMaterial(0, col, [0., 0., 0., 0.], vx);
-    vox.setMaterial(1, col, [0., 0., 0., 0.], vx);
-    vox.uploadMaterials();
+    
 
     //set caterrain parameters
     L = {"32": 5, "64": 6, "128": 7, "256": 8, "512": 9}["" + size]; caterrainsize = Math.pow(2, L) + 1; K = Math.floor(Math.pow(2, L)) + 1;
@@ -193,6 +243,14 @@ window.onload = async () => {
             vox.uploadRenderSettings(getUIValues());
         }
         flags["changed"] = false;
+        if (flags["material"]) {
+            vox.setMaterial(0, hexToRGB(document.querySelector("#color-0").value), [0., 0., 0., 0.], voxelMaterials[document.querySelector("#type-0").value]);
+            vox.setMaterial(1, hexToRGB(document.querySelector("#color-1").value), [0., 0., 0., 0.], voxelMaterials[document.querySelector("#type-1").value]);
+            vox.uploadMaterials();
+
+            vox.setReset();
+        }
+        flags["material"] = false;
 
         positionvelocity[0] -= positionvelocity[0] * delta * 5.;
         positionvelocity[1] -= positionvelocity[1] * delta * 5.;

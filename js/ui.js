@@ -53,7 +53,14 @@ function initUI(flags, callbacks, size) {
         document.querySelector("#speed-value"),
         4,
         dummyFlags
-    )
+    );
+    uiBindSlider(
+        document.querySelector("#flip-slider"),
+        a => a,
+        document.querySelector("#flip-value"),
+        4,
+        dummyFlags
+    );
 
     document.querySelector("#sky-color").oninput = () => {flags["changed"] = true;};
     document.querySelector("#sun-color").oninput = () => {flags["changed"] = true;};
@@ -99,6 +106,7 @@ function initUI(flags, callbacks, size) {
 
     document.querySelector("#regenerate-scene").onclick = async () => {
         flags["lock-input"] = true;
+        flipP = parseFloat(document.querySelector("#flip-slider").value);
         await newStateRandom();
         document.querySelector("#generation-stage").innerHTML = `rebuilding AS...`;
         await new Promise(r => setTimeout(r, 1));
@@ -153,6 +161,21 @@ function initUI(flags, callbacks, size) {
 
         navigator.clipboard.writeText(root + `?size=${size}&seed=${document.querySelector("#rule-seed").value}`);
     };
+
+    document.querySelector("#color-0").oninput = () =>  {
+        flags["material"] = true;
+    };
+    document.querySelector("#color-1").oninput = () => {
+        flags["material"] = true;
+    };
+    document.querySelector("#type-0").oninput = () => {
+        flags["material"] = true;
+    };
+    document.querySelector("#type-1").oninput = () => {
+        flags["material"] = true;
+    }
+
+    flags["material"] = true;
 }
 
 //writes all UI values to a typed array to be sent to the GPU

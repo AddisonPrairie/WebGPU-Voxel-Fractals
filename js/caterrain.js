@@ -15,7 +15,7 @@ function initArr() {
 
 function newRule(rng) {
     initArr();
-    randomRule(Math.max(Math.min(rng(), .7), .3), rng);
+    randomRule(Math.max(Math.min(rng(), .8), .1), rng);
 }
 
 async function newStateRandom() {

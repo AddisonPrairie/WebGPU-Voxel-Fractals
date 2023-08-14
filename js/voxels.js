@@ -735,7 +735,8 @@ async function voxels(canvas, size, options) {
             for (var j = 0; j < subvoxelWidth; j++) {
                 for (var k = 0; k < subvoxelWidth; k++) {
                     const idx = i + j * subvoxelWidth + k * subvoxelWidth * subvoxelWidth;
-                    u8view[index * bytesPerMaterial + 32 + Math.floor(idx / 8)] |= subvoxel[i][j][k] > 0 ? 1 << (idx % 8) : 0;
+                    u8view[index * bytesPerMaterial + 32 + Math.floor(idx / 8)] &= ~(1 << (idx % 8));
+                    u8view[index * bytesPerMaterial + 32 + Math.floor(idx / 8)] |= (subvoxel[i][j][k] > 0 ? 1 << (idx % 8) : 0);
                 }
             }
         }

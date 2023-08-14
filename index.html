@@ -162,6 +162,19 @@
                 flex-shrink: 1;
                 margin: 0px;
             }
+            .row-field > select {
+                flex-grow: 1; width: 1px;
+                margin: 0px;
+                margin-left: 3px;
+                height: var(--row-height);
+                line-height: var(--row-height);
+                background-color: green;
+                border: none;
+                font-family: 'Hack', monospace;
+                text-align: center;
+                background-color: rgb(54, 54, 54);
+                color: rgb(161, 161, 161);
+            }
             .help-background {
                 width: 100%; height: 100%;
                 position: absolute; z-index: 2;
@@ -211,9 +224,12 @@
                 &nbsp&nbspsky - sky color and intensity<br>
                 &nbsp&nbspnew rule - generates a new rule seed<br>
                 &nbsp&nbsprule seed - seed used to generate fractal<br>
+                &nbsp&nbspflip % - chance to flip a voxel during generation<br>
                 &nbsp&nbspregenerate scene - create new scene with seed<br>
                 &nbsp&nbspstage - status of scene generation<br>
                 &nbsp&nbspcopy seed url - copies URL with current seed to clipboard<br>
+                &nbsp&nbspvoxel 0/1 - change the color and shape of palette used<br>
+
                 &nbsp&nbspspeed - camera movement speed<br>
                 <br>
                 The default scene size is 64x64x64. Other available sizes include:<br>
@@ -295,7 +311,7 @@
                 <div class="row-spacer"></div>
                 <div class="row-field">
                     <input type="color" id="sky-color" value="#dcfafe">
-                    <input type="range" id="sky-brightness-slider" min="0" max="10" step=".01" value=".5">
+                    <input type="range" id="sky-brightness-slider" min="0" max="10" step=".01" value="1">
                     <div class="slider-value" id="sky-brightness-value">1.50</div>
                 </div>
             </div>
@@ -313,7 +329,15 @@
                 <div class="row-label">rule seed</div>
                 <div class="row-spacer"></div>
                 <div class="row-field">
-                    <input type="text" value="673-966-187-297" id="rule-seed">
+                    <input type="text" value="101-567-493-200" id="rule-seed"><!--673-966-187-297-->
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">flip %</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="range" id="flip-slider" min="0" max="1" step=".001" value=".99">
+                    <div class="slider-value" id="flip-value">1.50</div>
                 </div>
             </div>
             <div class="ui-row">
@@ -335,6 +359,35 @@
                 <div class="row-spacer"></div>
                 <div class="row-field">
                     <button id="copy-seed">copy seed url</button>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="header-row">VOXELS</div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">voxel 0</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="color" id="color-0" value="#ffa8a8"w>
+                    <select id="type-0">
+                        <option value="0">full</option>
+                        <option value="1">menger</option>
+                        <option value="2">cross</option>
+                        <option value="3">tube-up</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ui-row">
+                <div class="row-label">voxel 1</div>
+                <div class="row-spacer"></div>
+                <div class="row-field">
+                    <input type="color" id="color-1" value="#f0f0f0">
+                    <select id="type-1">
+                        <option value="0">full</option>
+                        <option value="1">menger</option>
+                        <option value="2">cross</option>
+                        <option value="3">tube-up</option>
+                    </select>
                 </div>
             </div>
             <div class="ui-row">
