@@ -5,7 +5,7 @@ async function voxels(canvas, size, options) {
     if ("profiling" in options && options["profiling"] == true) {reqs.push("timestamp-query");}
     
     const device = await adapter?.requestDevice({requiredFeatures: reqs});
-    if (!device) {console.error("browser does not support webGPU");return null;}
+    if (!device) {console.error("browser does not support webGPU"); alert("browser does not support webGPU"); return null;}
     
     const context = canvas.getContext("webgpu");
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
