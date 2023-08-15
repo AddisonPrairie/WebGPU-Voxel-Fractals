@@ -182,13 +182,10 @@ window.onload = async () => {
         const delta = now - then;
         then = now;
 
-        mousevelocity.x += deltaX * delta;
-        mousevelocity.y += deltaY * delta;
-        theta += mousevelocity.x * delta * 1.5;
-        phi   += mousevelocity.y * delta * 1.5;
+        if (deltaX != 0 || deltaY != 0) {vox.setReset()};
+        theta -= deltaX * .002;
+        phi   -= deltaY * .002;
         phi = Math.min(Math.max(phi, .99 * -Math.PI / 2.), .99 * Math.PI / 2.);
-        mousevelocity.x -= mousevelocity.x * delta * 5.;
-        mousevelocity.y -= mousevelocity.y * delta * 5.;
 
         for (var x in keyinputs) {
             let speed = 1000.;
@@ -228,8 +225,6 @@ window.onload = async () => {
         position[2] += positionvelocity[2] * delta * speed;
 
         if (
-            Math.abs(mousevelocity.x) > .005 || 
-            Math.abs(mousevelocity.y) > .005 ||
             Math.abs(positionvelocity[0]) > .2 ||
             Math.abs(positionvelocity[1]) > .2 ||
             Math.abs(positionvelocity[2]) > .2

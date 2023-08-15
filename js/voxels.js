@@ -932,7 +932,7 @@ async function voxels(canvas, size, options) {
     let frames = 0;
     async function frame() {
         if (fReset) {frames = 0;}
-        if (frames > 1023) {return {done: true, samples: frames};}
+        if (frames > 511) {return {done: true, samples: frames};}
         const pingpong     = frames % 2;
         //-------- Create and Write Inverse View and Projection Matrices --------//
         let t = glMatrix.mat4.create(); let v = glMatrix.mat4.create();
