@@ -12,4 +12,4 @@ While this demo is capable of running on integrated graphics, the performance is
 ![](https://live.staticflickr.com/65535/53117447736_b4a2a23fe7_c.jpg)<br><br>
 ![](https://live.staticflickr.com/65535/53117446946_827ffd6cb8_c.jpg)<br><br>
 
-The rendering code was written by me (Addison Prairie). It consists of a few fragment shaders for raytracing, sample accumulation, and post processing. It uses [glMatrix](https://github.com/toji/gl-matrix) for JS linear algebra operations. Other attributions for specific functions can be found in the source code.
+The rendering code was written by me. It consists of a few fragment shaders for raytracing, sample accumulation, and post processing. It uses [glMatrix](https://github.com/toji/gl-matrix) for JS linear algebra operations. Other attributions for specific functions can be found in the source code.
