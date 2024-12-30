@@ -1132,5 +1132,5 @@ async function voxels(canvas, size, options) {
         fReset = true;
     }
 
-    return {frame, setPosition, setLookAt, setFOV, uploadScene, setVoxel, setMaterial, uploadMaterials, setReset, uploadRenderSettings, downloadImage, adapterInfo: await adapter.requestAdapterInfo()};
+    return {frame, setPosition, setLookAt, setFOV, uploadScene, setVoxel, setMaterial, uploadMaterials, setReset, uploadRenderSettings, downloadImage, adapterInfo: adapter.info};
 }
